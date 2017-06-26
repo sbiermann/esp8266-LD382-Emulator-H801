@@ -120,6 +120,8 @@ void loop()
       i = client.available();
       if(i > 0)
       {
+        if(i > 8)//read only 1 sequence and than the next
+         i = 8;
         client.read(readBuffer,i);
         if(debugOutput){
           Serial1.print("received: ");
