@@ -110,16 +110,19 @@ void loop()
   }
   if(!server.hasClient())
   {
+    yield();
     return;
   }
   uint8_t readBuffer[8];
   int i = 0;
+  long lastAccess=millis();
   client = server.available();
   if(debugOutput) Serial1.println("found a connection...");
   while (client.connected()) {     
       i = client.available();
       if(i > 0)
       {
+        lastAccess = millis();
         if(i > 8)//read only 1 sequence and than the next
          i = 8;
         client.read(readBuffer,i);
@@ -170,8 +173,19 @@ void loop()
         }
         i = 0;
       }
+      if(WiFi.status() != WL_CONNECTED) {
+        ESP.restart();
+        delay(100);
+      }
+      if(millis()-lastAccess > 300000)
+      {
+        if(debugOutput) Serial1.println("timeout reached... disconnecting");
+        client.stop();
+      }
+      yield();
     }
-  client.stop();
+    if(debugOutput) Serial1.println("client disconnected...");
+    client.stop();
 }
 
 bool checkChecksum(uint8_t rBuffer[])
