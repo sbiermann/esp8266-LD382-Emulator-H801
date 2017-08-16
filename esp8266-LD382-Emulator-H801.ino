@@ -72,7 +72,12 @@ void setup()
     Serial1.print("Connecting to ");
     Serial1.println(ssid);
   }
+  WiFi.persistent(false);
+  WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
+  if(ip != IPAddress(0,0,0,0)) {
+   WiFi.config(ip,gateway,subnet);
+  }
   int maxWait = 500;
   while (WiFi.status() != WL_CONNECTED) {
     LED2off;
